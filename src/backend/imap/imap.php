@@ -2051,6 +2051,7 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
                         if ($subFolderId !== false) { // only search found folders
                             $subList = @imap_search($this->mbox, $filter, SE_UID, IMAP_SEARCH_CHARSET);
                             if ($subList !== false) {
+                                rsort($subList, SORT_NUMERIC); // newest UID first, some? clients are displaying results in reverse order
                                 $numMessages += count($subList);
                                 ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->GetMailboxSearchResults: SubSearch in %s : %s ocurrences", $imapSubFolder, count($subList)));
                                 $listMessages[] = array($subFolderId => $subList);
@@ -2064,6 +2065,7 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
             if (@imap_reopen($this->mbox, $this->server . $imapId)) {
                 $subList = @imap_search($this->mbox, $filter, SE_UID, IMAP_SEARCH_CHARSET);
                 if ($subList !== false) {
+                    rsort($subList, SORT_NUMERIC); // newest UID first, some? clients are displaying results in reverse order
                     $numMessages += count($subList);
                     ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->GetMailboxSearchResults: Search in %s : %s ocurrences", $imapId, count($subList)));
                     $listMessages[] = array($searchFolderId => $subList);
