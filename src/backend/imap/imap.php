@@ -2079,8 +2079,8 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
             $rangeend = SEARCH_MAXRESULTS - 1;
 
             if (is_array($searchRange) && isset($searchRange[0]) && isset($searchRange[1])) {
-                $rangestart = $searchRange[0];
-                $rangeend = $searchRange[1];
+                $rangestart = (int)$searchRange[0];
+                $rangeend = (int)$searchRange[1];
             }
 
             $querycnt = $numMessages;
@@ -2092,6 +2092,23 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
 
             $p = 0;
             $pc = 0;
+
+            // skip to requested range start
+            $skip = (int)$rangestart;
+            while ($skip > 0 && isset($listMessages[$p])) {
+                $keys = array_keys($listMessages[$p]);
+                $cntFolder = count($listMessages[$p][$keys[0]]);
+
+                if ($skip >= $cntFolder) {
+                    $skip -= $cntFolder;
+                    $p++;
+                    $pc = 0;
+                }
+                else {
+                    $pc = $skip;
+                    $skip = 0;
+                }
+            }
             for ($i = $rangestart, $j = 0; $i <= $rangeend && $i < $querycnt; $i++, $j++) {
                 $keys = array_keys($listMessages[$p]);
                 $cntFolder = count($listMessages[$p][$keys[0]]);
